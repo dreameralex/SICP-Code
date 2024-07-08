@@ -27,6 +27,7 @@ function map(fun, items){
 
 
 
+
 // List
 function list(...rest){
     function make_list(list_input){
@@ -55,25 +56,50 @@ function print_list_temp(items){
 
 
 
-function print_list(items){
-    if(tail(items)!==null){
-        if(head(items).name === "dispatch"){
-            print_list(head(items))
-            console.log("~")
-        }else{
-            console.log(head(items))
-        }
-        print_list(tail(items))
-    }else{
-        if(head(items).name === "dispatch"){
-            print_list(head(items))
-            console.log("~")
-        }else{
-            console.log(head(items))
-        }  
-    }
-}
+// function print_list(items){
+//     if(tail(items)!==null){
+//         if(head(items).name === "dispatch"){
+//             print_list(head(items))
+//             console.log("~")
+//         }else{
+//             console.log(head(items))
+//             // process.stdout.write(head(items) + ", ")
+//         }
+//         print_list(tail(items))
+//     }else{
+//         if(head(items).name === "dispatch"){
+//             print_list(head(items))
+//             console.log("~")
+//         }else{
+//             console.log(head(items))
+//             // process.stdout.write(head(items) + " ")
+//         }
+//     }
+// }
 
+function print_list(items){
+    var arr = []
+    function temp(items){
+        if(tail(items)!==null){
+            if(head(items).name === "dispatch"){
+                temp(head(items))
+                arr.push("~")
+            }else{
+                arr.push(head(items))
+            }
+            temp(tail(items))
+        }else{
+            if(head(items).name === "dispatch"){
+                temp(head(items))
+                arr.push("~")
+            }else{
+                arr.push(head(items))
+            }
+        }
+    }
+    temp(items)
+    console.log(arr)
+}
 
 
 // function append(list1, list2){
@@ -128,9 +154,11 @@ function enumerate_interval(low, high){
 
 
 module.exports = {
+    pair,
     list,
     head,
     tail,
     append,
+    map,
     print_list
 }
