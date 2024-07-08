@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>expt_basic:</h2>
+    <p id="expt_basic"></p>
+    <hr>
+    <h2>expt_imporve:</h2>
+    <p id="result_iter"></p>
+    <hr>
+    <h2>expt_fast:</h2>
+    <p id="result_fast"></p>
+
+<script>
+    //Bacic
+    var expt_basic = expt(4,3);
+    document.getElementById("expt_basic").innerHTML = expt_basic;
+    function expt(b,n){
+        return n === 0
+            ? 1
+            : b*expt(b,n-1)
+    }
+
+    // equivalent linear iteration:
+    function expt_imporve(b,n){
+        return expt_iter(b,n,1)
+    }
+    function expt_iter(b, counter, product){
+        return counter === 0
+            ? product
+            : expt_iter(b, counter - 1, b * product)
+    }
+    var result_iter = expt_imporve(4,4);
+    document.getElementById("result_iter").innerHTML = result_iter;
+
+    //computing exponentials
+    function fast_expt(b,n){
+        return n === 0
+            ? 1
+            : is_even(n)
+            ? square(fast_expt(b,n/2))
+            : b * fast_expt(b,n-1)
+    }
+    function is_even(n){
+        return n % 2 === 0;
+    }
+    function square(n){
+        return n*n
+    }
+
+    var result_fast = fast_expt(4,4);
+    document.getElementById("result_fast").innerHTML = result_fast;
+
+</script>
+
+</body>
+</html>
