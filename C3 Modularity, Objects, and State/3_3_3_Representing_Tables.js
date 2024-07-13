@@ -1,0 +1,1 @@
+const data = require('../../Basic/Data_structure')
