@@ -2,31 +2,54 @@ class Basic {
 
 }
 
-Basic.prototype.pair = function(x,y){
-    function dispatch(m){
-        return m === 0
-            ? x
-            : m === 1
-            ? y
-            : console.error(m,'argument not 0 or 1 -- pair');
-    }
-    return dispatch;
+// Basic.prototype.pair = function(x,y){
+//     function dispatch(m){
+//         return m === 0
+//             ? x
+//             : m === 1
+//             ? y
+//             : Error(m,'argument not 0 or 1 -- pair');
+//     }
+//     return dispatch;
+// }
+
+
+Basic.prototype.get_new_pair = function(){
+    return
 }
 
+Basic.prototype.pair = function(x,y){
+    function set_x(v){x = v}
+    function set_y(v){y = v}
+    return m => m === 'head'
+        ? x 
+        : m === "tail"
+        ? y
+        : m === "set_head"
+        ? set_x
+        : m === "set_tail"
+        ? set_y
+        : Error("undefined operation -- pair");
+}
+
+
+
 Basic.prototype.head = function(z){
-    return z(0);
+    return z("head")
 }
 
 Basic.prototype.tail = function(z){
-    return z(1);
+    return z("tail")
 }
 
-Basic.prototype.set_head = function(pair,item){
-    return this.pair(item,this.tail(pair))
+Basic.prototype.set_head = function(z, new_value){
+    z("set_head")(new_value)
+    return z
 }
 
-Basic.prototype.set_tail = function(pair,item){
-    return this.pair(this.head(pair),item)
+Basic.prototype.set_tail = function(z, new_value){
+    z("set_tail")(new_value)
+    return z
 }
 
 Basic.prototype.map = function(fun, items){
@@ -135,47 +158,80 @@ Basic.prototype.enumerate_interval= function(low, high){
 BasicTool = new Basic()
 
 
-class DataStructer{
+class DataStructer_Queue{
     
 }
 
-DataStructer.prototype.make_queue = function(){
+DataStructer_Queue.prototype.make_queue = function(){
     return BasicTool.pair(null,null)
 }
-DataStructer.prototype.front_ptr = function(queue){
+
+
+DataStructer_Queue.prototype.front_ptr = function(queue){
     return BasicTool.head(queue)
 }
-DataStructer.prototype.rear_ptr = function(queue){
+DataStructer_Queue.prototype.rear_ptr = function(queue){
     return BasicTool.tail(queue)
 }
-DataStructer.prototype.set_font_ptr = function(queue,item){
+
+// item is a pair
+DataStructer_Queue.prototype.set_front_ptr = function(queue,item){
     BasicTool.set_head(queue,item)
 }
-DataStructer.prototype.set_font_ptr = function(queue,item){
+DataStructer_Queue.prototype.set_rear_ptr = function(queue,item){
     BasicTool.set_tail(queue,item)
 }
 
-DataStructer.prototype.is_empty_queue = function(queue){
+DataStructer_Queue.prototype.is_empty_queue = function(queue){
     return this.front_ptr(queue) === null && this.rear_ptr(queue) == null
         ? true
         : false  
 }
 
 
-DataStructer.prototype.front_queue= function(queue){
+DataStructer_Queue.prototype.front_queue= function(queue){
     return this.is_empty_queue(queue)
-        ? error(queue, "front_queue called with an empty queue")
+        ? Error("front_queue called with an empty queue")
         : BasicTool.head(this.front_ptr(queue));
 }
 
+DataStructer_Queue.prototype.insert_queue = function(queue, item){
+    const new_pair = BasicTool.pair(item, null);
+    if (this.is_empty_queue(queue)){
+        this.set_front_ptr(queue,new_pair);
+        this.set_rear_ptr(queue, new_pair);
+    }else{
+        BasicTool.set_tail(this.rear_ptr(queue), new_pair);
+        this.set_rear_ptr(queue, new_pair)
+    }
+}
 
-Structure = new DataStructer()
+DataStructer_Queue.prototype.delete_queue = function(queue){
+    if (this.is_empty_queue(queue)){
+        Error("delete_queue called with an empty queue")
+    }else{
+        this.set_front_ptr(queue, BasicTool.tail(this.front_ptr(queue)));
+        return queue;
+    }
+}
+
+DataStructer_Queue.prototype.print_queue = function(queue){
+    temp = this.front_ptr(queue)
+    while(temp !== null){
+        console.log(BasicTool.head(temp))
+        temp = BasicTool.tail(temp)
+    }
+}
+
+
+
+Structure_Queue = new DataStructer_Queue()
 // console.log("Test if queue is empty: ",Structure.is_empty_queue(queue))
 
-console.log(Structure.prototype)
+console.log(Structure_Queue.prototype)
 
 
 module.exports = {
     BasicTool,
-    Structure
+    Structure_Queue
 }

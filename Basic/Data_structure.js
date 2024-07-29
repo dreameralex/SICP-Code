@@ -168,7 +168,7 @@ function pair(x, y) {
         : m === "set_tail"
         ? set_y
         : error(m, "undefined operation -- pair");
-    }
+}
 
 function head(z) { return z("head"); }
 
