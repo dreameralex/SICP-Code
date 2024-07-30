@@ -1,8 +1,8 @@
 "use strict";
 
-var Queue = require('../Basic/test').Structure_Queue;
+var Queue = require('../Basic/Data_structure_m').Structure_Queue;
 
-var BasicTool = require('../Basic/test').BasicTool;
+var BasicTool = require('../Basic/Basic').BasicTool;
 
 queue = Queue.make_queue();
 console.log("Test if queue is empty: ", Queue.is_empty_queue(queue));

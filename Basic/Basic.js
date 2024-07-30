@@ -61,14 +61,24 @@ Basic.prototype.map = function(fun, items){
 }
 // List
 Basic.prototype.list = function(...rest){
+    temp = new Basic()
     function make_list(list_input){
         var a = list_input.shift()
         return list_input.length === 0
-            ? this.pair(a,null)
-            : this.pair(a,make_list(rest))
+            ? temp.pair(a,null)
+            : temp.pair(a,make_list(rest))
     }
     return make_list(rest)
 }
+
+Basic.prototype.test = function(x,y){
+    return this.pair(x,y)
+}
+
+
+
+
+
 
 
 Basic.prototype.print_list_temp = function(items){
@@ -154,84 +164,39 @@ Basic.prototype.enumerate_interval= function(low, high){
 
 
 
+Basic.prototype.is_null = function(item){
+    return item === null
+        ? true
+        : false
+}
+
+Basic.prototype.is_undefined = function(item){
+    return item === undefined
+        ? true
+        : false
+}
+
+Basic.prototype.equal = function(item1,item2){
+    return item1 === item2
+        ? true
+        : false
+}
+
+
+
+
+
+
+
+
+
 
 BasicTool = new Basic()
 
-
-class DataStructer_Queue{
-    
-}
-
-DataStructer_Queue.prototype.make_queue = function(){
-    return BasicTool.pair(null,null)
-}
-
-
-DataStructer_Queue.prototype.front_ptr = function(queue){
-    return BasicTool.head(queue)
-}
-DataStructer_Queue.prototype.rear_ptr = function(queue){
-    return BasicTool.tail(queue)
-}
-
-// item is a pair
-DataStructer_Queue.prototype.set_front_ptr = function(queue,item){
-    BasicTool.set_head(queue,item)
-}
-DataStructer_Queue.prototype.set_rear_ptr = function(queue,item){
-    BasicTool.set_tail(queue,item)
-}
-
-DataStructer_Queue.prototype.is_empty_queue = function(queue){
-    return this.front_ptr(queue) === null && this.rear_ptr(queue) == null
-        ? true
-        : false  
-}
-
-
-DataStructer_Queue.prototype.front_queue= function(queue){
-    return this.is_empty_queue(queue)
-        ? Error("front_queue called with an empty queue")
-        : BasicTool.head(this.front_ptr(queue));
-}
-
-DataStructer_Queue.prototype.insert_queue = function(queue, item){
-    const new_pair = BasicTool.pair(item, null);
-    if (this.is_empty_queue(queue)){
-        this.set_front_ptr(queue,new_pair);
-        this.set_rear_ptr(queue, new_pair);
-    }else{
-        BasicTool.set_tail(this.rear_ptr(queue), new_pair);
-        this.set_rear_ptr(queue, new_pair)
-    }
-}
-
-DataStructer_Queue.prototype.delete_queue = function(queue){
-    if (this.is_empty_queue(queue)){
-        Error("delete_queue called with an empty queue")
-    }else{
-        this.set_front_ptr(queue, BasicTool.tail(this.front_ptr(queue)));
-        return queue;
-    }
-}
-
-DataStructer_Queue.prototype.print_queue = function(queue){
-    temp = this.front_ptr(queue)
-    while(temp !== null){
-        console.log(BasicTool.head(temp))
-        temp = BasicTool.tail(temp)
-    }
-}
-
-
-
-Structure_Queue = new DataStructer_Queue()
 // console.log("Test if queue is empty: ",Structure.is_empty_queue(queue))
 
-console.log(Structure_Queue.prototype)
 
 
 module.exports = {
-    BasicTool,
-    Structure_Queue
+    BasicTool
 }

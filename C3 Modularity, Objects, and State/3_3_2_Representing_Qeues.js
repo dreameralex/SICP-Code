@@ -1,5 +1,5 @@
-const Queue = require('../Basic/test').Structure_Queue
-const BasicTool = require('../Basic/test').BasicTool
+const Queue = require('../Basic/Data_structure_m').Structure_Queue
+const BasicTool = require('../Basic/Basic').BasicTool
 
 
 
@@ -23,8 +23,12 @@ console.log("Rear of the queue", Queue.rear_ptr(queue))
 
 
 Queue.print_queue(queue)
+
+
 Queue.delete_queue(queue)
 Queue.delete_queue(queue)
+
+
 Queue.print_queue(queue)
 
 
