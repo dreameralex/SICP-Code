@@ -92,16 +92,17 @@ Basic.prototype.print_list_temp = function(items){
 
 
 Basic.prototype.print_list = function(items){
-    if(tail(items)!==null){
-        if(head(items).name === "dispatch"){
+    if(this.tail(items)!==null){
+        if(this.head(items).name === "dispatch"){
             print_list(this.head(items))
             console.log("~")
         }else{
             console.log(this.head(items))
         }
-        print_list(tail(items))
+        
+        (this.tail(items))
     }else{
-        if(head(items).name === "dispatch"){
+        if(this.head(items).name === "dispatch"){
             print_list(this.head(items))
             console.log("~")
         }else{
@@ -182,8 +183,13 @@ Basic.prototype.equal = function(item1,item2){
         : false
 }
 
+Basic.prototype.stringfy = function(item){
+    return item.toString()
+}
 
-
+Basic.prototype.display = function(item){
+    console.log(item)
+}
 
 
 
