@@ -31,11 +31,14 @@ function and_gate(a1, a2, output){
     function and_action_function(){
         const new_value = logical_and(get_signal(a1),
                                     get_signal(a2));
+        // console.log(new_value)
         after_delay(and_gate_delay,
                     ()=> set_signal(output, new_value)
         )
     }
+    // console.log("a1:")
     add_action(a1, and_action_function);
+    // console.log("a2:")
     add_action(a2, and_action_function);
     return "ok";
 }
@@ -74,6 +77,19 @@ function logical_or(a,b){
 
 
 
+
+
+function half_adder(a,b,s,c){
+    const d = make_wire();
+    const e = make_wire();
+    or_gate(a,b,d);
+    and_gate(a,b,c);
+    inverter(c,e);
+    and_gate(d,e,s);
+    return "ok"
+}
+
+
 // console.log(logical_and(1,1))
 // console.log(logical_and(0,1))
 // console.log(logical_and(1,0))
@@ -87,13 +103,13 @@ const d = make_wire();
 const e = make_wire();
 const s = make_wire();
 
-// or_gate(a,b,d)
-// or_gate(a,b,c)
+or_gate(a,b,d)
+or_gate(a,b,c)
 inverter(c,e)
 and_gate(d,e,s)
 
 
-
+console.log("Basic Parts End:")
 
 
 //Representing wires
@@ -124,8 +140,10 @@ function make_wire(){
     return dispatch
 }
 
+//it runs each of the action functions, using the following function call_each,
+//which calls each of the items in a list of no-argument functions
 function call_each(functions){
-    if (BasicTool.is_null()){
+    if (BasicTool.is_null(functions)){
         return "done"
     }else{
         BasicTool.head(functions)();
@@ -148,12 +166,15 @@ function add_action(wire, action_function) {
 
 // The agenda
 function after_delay(delay, action){
+
+    // console.log("after_delay",delay,current_time(the_agenda))
     add_to_agenda(delay + current_time(the_agenda),
                     action, the_agenda)
 }
 
 function propagate(){
     if(is_empty_agenda(the_agenda)){
+        console.log("done")
         return "done"
     }else{
         const first_item = first_agenda_item(the_agenda);
@@ -174,11 +195,12 @@ function prob(name, wire){
 }
 
 // const the_agenda = make_agenda()
-BasicTool.display("A Sample simulation")
+BasicTool.display("\nA Sample simulation")
 
 // const inverter_delay = 2;
 // const and_gate_delay = 3;
 // const or_gate_delay = 5;
+
 
 const input_1 = make_wire()
 const input_2 = make_wire()
@@ -187,6 +209,14 @@ const carry = make_wire()
 
 prob("sum", sum)
 prob("carry", sum)
+console.log("Finish prob")
+
+half_adder(input_1, input_2, sum, carry);
+set_signal(input_1, 1);
+// propagate();
+set_signal(input_2, 1);
+propagate();
+//结果不太对，我也不知道为啥......
 
 
 
@@ -199,6 +229,7 @@ function make_time_segment(time,queue){
 }
 
 function segment_time(s){
+    // console.log("segment_time",s)
     return BasicTool.head(s)
 }
 
@@ -237,40 +268,69 @@ function is_empty_agenda(agenda){
 
 function add_to_agenda(time, action, agenda){
     function belongs_before(segs){
+        // console.log("belongs_before",time,BasicTool.is_null(segs) ||
+        //                     time < segment_time(BasicTool.head(segs)))
         return BasicTool.is_null(segs) ||
                 time < segment_time(BasicTool.head(segs))
     }
     function make_new_time_segment(time, action){
+        // console.log("make_new_time_segment")
         const q = Queue.make_queue()
         Queue.insert_queue(q, action)
         return make_time_segment(time,q)
     }
     function add_to_segments(segs){
-        if(segment_time(BasicTool.head(segs) === time)){
+        // console.log("segs",BasicTool.head(BasicTool.head(segs)))
+        if(segment_time(BasicTool.head(segs)) === time){
+            // console.log("add to segments1")
             Queue.insert_queue(segment_queue(BasicTool.head(segs)), action);
         }else{
             const rest = BasicTool.tail(segs);
+            // console.log("add to segments2")
             if(belongs_before(rest)){
                 BasicTool.set_tail(segs,
                     BasicTool.pair(make_new_time_segment(time, action),
                                     BasicTool.tail(segs)))
             }else{
-                add_to_segments(segs)
+                // console.log("add to segments2 else")
+                add_to_segments(rest)
             }
         }
     }
     const segs = segments(agenda);
     if(belongs_before(segs)){
+        // console.log("belongs_before(segs)")
         set_segments(agenda,
             BasicTool.pair(make_new_time_segment(time, action), segs))
     }else{
+        // console.log("belongs_before(segs) else")
         add_to_segments(segs)
+    }
+}
+
+function remove_first_agenda_item(agenda){
+    const q = segment_queue(first_segment(agenda))
+    Queue.delete_queue(q);
+    if(Queue.is_empty_queue(q)){
+        set_segments(agenda, rest_segments(agenda));
+    }else{}
+}
+
+function first_agenda_item(agenda){
+    if(is_empty_agenda(agenda)){
+        Error("agenda is empty -- first_agenda_item");
+    }else{
+        const first_seg = first_segment(agenda);
+        // console.log("first_agenda_item:",first_seg)
+        set_current_time(agenda, segment_time(first_seg));
+        // console.log("first_agenda_item:",segment_queue(first_seg),BasicTool.head(segment_queue(first_seg)))
+        return Queue.front_queue(segment_queue(first_seg))
     }
 }
 
 
 // Make agenda
-console.log("Make a agenda:")
+console.log("\nMake a agenda:")
 agenda = make_agenda()
 print_agenda(agenda)
 console.log("Is the agenda empty? ", is_empty_agenda(agenda))

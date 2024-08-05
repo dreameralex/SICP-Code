@@ -29,7 +29,7 @@ DataStructure_Queue.prototype.set_rear_ptr = function(queue,item){
 }
 
 DataStructure_Queue.prototype.is_empty_queue = function(queue){
-    return this.front_ptr(queue) === null && this.rear_ptr(queue) == null
+    return this.front_ptr(queue) === null
         ? true
         : false  
 }
