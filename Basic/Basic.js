@@ -76,7 +76,14 @@ Basic.prototype.test = function(x,y){
     return this.pair(x,y)
 }
 
-
+// To tell whether x in itmes, itme is a list
+Basic.prototype.member = function(item, x){
+   return this.is_null(x)
+        ? null
+        : item === this.head(item)
+        ? x
+        : this.member(item, this.tail(x))
+}
 
 
 
