@@ -3,7 +3,7 @@ const Queue = require('../Basic/Data_structure_m').Structure_Queue
 
 
 //Using the constraint system
-
+console.log("Using the constraint system")
 const C = make_connector(); 
 const F = make_connector();
 celsius_fahrenheit_converter(C, F);
@@ -24,11 +24,14 @@ function celsius_fahrenheit_converter(c, f) {
 }
 probe("Celsius temp", C); 
 probe("Fahrenheit temp", F);
+
+console.log("C = 25")
 set_value(C, 25, "user"); 
+console.log("F = 77")
 set_value(F, 212, "user");
-
+console.log("forget_value")
 forget_value(C, "user");
-
+console.log("F = 212")
 set_value(F, 212, "user");
 
 
@@ -186,7 +189,7 @@ function make_connector(){
         }else if(value !== newval){
             Error(BasicTool.list(value, newval), "contradiction");
         }else{
-            console("ignored")
+            // console("ignored")
             return "ignored";
         }
     }
@@ -198,7 +201,7 @@ function make_connector(){
                                     constraints
             )
         }else{
-            console.log("ignored")
+            // console.log("ignored")
             return "ignored";
         }
     }
@@ -265,7 +268,7 @@ function connect(connector, new_constraint) {
     return connector("connect")(new_constraint);
 }
 
-
+// Exercise 3.33
 
 
 

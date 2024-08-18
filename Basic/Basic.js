@@ -172,7 +172,6 @@ Basic.prototype.enumerate_interval= function(low, high){
 //print_list(enumerate_interval(1,10))
 
 
-
 Basic.prototype.is_null = function(item){
     return item === null
         ? true
@@ -199,8 +198,52 @@ Basic.prototype.display = function(item){
     console.log(item)
 }
 
+// Math
+Basic.prototype.is_even = function(n){
+    return n%2 === 0
+        ? true
+        : false
+}
+
+function is_even(n){
+    return n % 2 === 0
+        ? true
+        : false
+}
+
+Basic.prototype.expmod = function(base, exp, m){
+    // console.log(1)
+    if (exp === 0){
+        return 1;
+    }else{
+        if(is_even(exp)){
+            const half_exp = this.expmod(base, exp/2, m);
+            return half_exp *  half_exp % m;
+        }else{
+            return base * this.expmod(base, exp-1, m) % m; 
+        }
+    }
+}
 
 
+Basic.prototype.fermat_test = function(n){
+    expmod = this.expmod
+    function try_it(a){
+        return expmod(a, n, n) === a;
+    }
+    // console.log("fermat_test",n,try_it(1 + Math.floor(Math.random() * (n - 1))))
+    return try_it(1 + Math.floor(Math.random() * (n - 1)));
+}
+
+
+Basic.prototype.fast_is_prime = function(n, times){
+    // console.log("fast_is_prime",n, times,this.prototype)
+    return times === 0
+        ? true
+        : this.fermat_test(n)
+        ? this.fast_is_prime(n, times -1)
+        : false;
+}
 
 
 
