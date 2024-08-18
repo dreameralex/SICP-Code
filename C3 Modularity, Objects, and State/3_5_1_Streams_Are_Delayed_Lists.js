@@ -46,3 +46,13 @@ Stream.display_stream(StreamInterval_prime)
 console.log("Stream Map optimization:")
 StreamInterval_map2 = Stream.stream_map((x)=>x + 999, StreamInterval)
 Stream.display_stream(StreamInterval_map2)
+
+
+console.log("Stream Map2:")
+
+
+
+StreamInterval_map_add = Stream.stream_map_2((x,y)=>x + y, StreamInterval, StreamInterval)
+
+// console.log(BasicTool.tail(BasicTool.head(StreamInterval_map_add)))
+Stream.display_stream(StreamInterval_map_add)

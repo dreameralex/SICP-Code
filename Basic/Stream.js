@@ -84,6 +84,28 @@ DataStructure_Stream.prototype.stream_map_optimized = function(func, stream){
                                 this.memo(()=>this.stream_map_optimized(func, this.stream_tail(stream))))
 }
 
+//Exercise 3.50
+
+DataStructure_Stream.prototype.stream_map_2 = function(f, s1, s2){
+    return BasicTool.is_null(s1) && BasicTool.is_null(s2)
+        ? null
+        : BasicTool.is_null(s1) || BasicTool.is_null(s2)
+        ? Error(null, "unexpected argument -- stream_map_2")
+        : BasicTool.pair(f(BasicTool.head(s1),BasicTool.head(s2)), 
+               this.memo(() => this.stream_map_2(f, this.stream_tail(s1),
+                                                this.stream_tail(s2))));
+}
+
+
+
+
+//
+DataStructure_Stream.prototype.add_streams = function(s1, s2){
+    return this.stream_map_2((x1, x2) => x1 + x2, s1, s2);
+}
+
+
+
 
 // Export Data Structure
 Structure_Stream = new DataStructure_Stream()
