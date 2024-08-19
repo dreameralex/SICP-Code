@@ -39,6 +39,20 @@ DataStructure_Stream.prototype.display_stream = function(s){
     return this.stream_for_each(BasicTool.display, s);
 }
 
+
+DataStructure_Stream.prototype.display_InfinityStream = function(s,number){
+    while(number>=0){
+        console.log(BasicTool.head(s))
+        s = this.stream_tail(s)
+        number--
+    }
+}
+
+
+
+
+
+
 DataStructure_Stream.prototype.stream_enumerate_interval = function(low, high){
     return low > high
         ? null
@@ -54,6 +68,11 @@ DataStructure_Stream.prototype.stream_filter = function(func, stream){
                         () => this.stream_filter(func, this.stream_tail(stream)))
         : this.stream_filter(func, this.stream_tail(stream));
 }
+
+
+
+
+
 
 // implement the construction of stream pairs as a memoized function similar to the one described in exercise
 DataStructure_Stream.prototype.memo = function(func){
@@ -104,7 +123,9 @@ DataStructure_Stream.prototype.add_streams = function(s1, s2){
     return this.stream_map_2((x1, x2) => x1 + x2, s1, s2);
 }
 
-
+DataStructure_Stream.prototype.mul_streams = function(s1, s2){
+    return this.stream_map_2((x1, x2) => x1 * x2, s1, s2);
+}
 
 
 // Export Data Structure

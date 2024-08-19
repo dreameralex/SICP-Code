@@ -82,7 +82,8 @@ MathTools.prototype.fast_is_prime = function(n, times){
 
 MathTools.prototype.isPrime = function(n){
     times = 20
-    return this.fast_is_prime(n,times)
+    result = this.fast_is_prime(n,times)
+    return result
 }
 
 MathTool = new MathTools()
