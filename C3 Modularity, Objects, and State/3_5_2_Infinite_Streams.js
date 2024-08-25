@@ -75,3 +75,84 @@ function partial_sums(stream){
 
 partial_sums_result = partial_sums(integers)
 Stream.display_InfinityStream(partial_sums_result, 8)
+
+console.log("Exercise 3.56")
+function merge(s1, s2){
+    if (BasicTool.is_null(s1)){
+        return s2;
+    }else if(BasicTool.is_null(s2)){
+        return s1;
+    }else{
+        const s1head = BasicTool.head(s1);
+        const s2head = BasicTool.head(s2);
+        return s1head < s2head
+            ? BasicTool.pair(s1head,
+                            ()=>merge(Stream.stream_tail(s1), s2))
+            : s1head > s2head
+            ? BasicTool.pair(s2head,
+                            ()=>merge(s1,Stream.stream_tail(s2)))
+            : BasicTool.pair(s1head,
+                            ()=>merge(Stream.stream_tail(s1), Stream.stream_tail(s2)))
+    }
+}
+
+S  = BasicTool.pair(1, ()=>merge(Stream.scale_stream(s, 2),
+                                    merge(Stream.scale_stream(s, 3),Stream.scale_stream(s, 5))))
+
+Stream.display_InfinityStream(S, 20)
+
+console.log("Exercise 3.59")
+function integrate_series(s){
+    function helper(ss, iter){
+        return BasicTool.pair(BasicTool.head(ss)/iter, ()=>helper(Stream.stream_tail(ss), iter+1))
+    }
+    return helper(s, 1);
+}
+
+
+exp_series = BasicTool.pair(1, ()=>integrate_series(exp_series))
+Stream.display_InfinityStream(exp_series, 20)      
+
+
+
+cos_series = BasicTool.pair(1, ()=>integrate_series(
+    BasicTool.pair(0, 
+        ()=>Stream.stream_map(
+            (x) => (-x), integrate_series(cos_series)
+                            )
+                    )
+    )
+)
+
+Stream.display_InfinityStream(cos_series, 20)                            
+
+console.log("Sin:")
+sin_series = BasicTool.pair(0, ()=>integrate_series(
+    BasicTool.pair(1, 
+        ()=>Stream.stream_map(
+            (x) => (-x), sin_series
+                            )
+                    )
+    )
+)
+Stream.display_InfinityStream(sin_series, 20)       
+
+console.log("Exercise 3.60")
+
+function mul_series(s1,s2){
+    BasicTool.pair(BasicTool.head(s1)*BasicTool.head(s2),
+                                ()=>Stream.add_streams(
+                                    mul_series(Stream.stream_tail(s1),s2),
+                                    Stream.scale_stream(Stream.stream_tail(s2),BasicTool.head(s1))
+                                ))
+}
+
+
+// integers_1 = integers_starting_from(1)
+// integers_2 = integers_starting_from(2)
+mul = mul_series(cos_series, cos_series)
+Stream.display_InfinityStream(mul, 20)
+//有问题！
+
+
+

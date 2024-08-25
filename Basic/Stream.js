@@ -115,8 +115,24 @@ DataStructure_Stream.prototype.stream_map_2 = function(f, s1, s2){
                                                 this.stream_tail(s2))));
 }
 
-
-
+DataStructure_Stream.prototype.mergeStream = function(s1, s2){
+    if (BasicTool.is_null(s1)){
+        return s2;
+    }else if(BasicTool.is_null(s2)){
+        return s1;
+    }else{
+        const s1head = BasicTool.head(s1);
+        const s2head = BasicTool.head(s2);
+        return s1head < s2head
+            ? BasicTool.pair(s1head,
+                            ()=>merge(Stream.stream_tail(s1), s2))
+            : s1head > s2head
+            ? BasicTool.pair(s2head,
+                            ()=>merge(s1,Stream.stream_tail(s2)))
+            : BasicTool.pair(s1head,
+                            ()=>merge(Stream.stream_tail(s1), Stream.stream_tail(s2)))
+    }
+}
 
 //
 DataStructure_Stream.prototype.add_streams = function(s1, s2){
@@ -125,6 +141,10 @@ DataStructure_Stream.prototype.add_streams = function(s1, s2){
 
 DataStructure_Stream.prototype.mul_streams = function(s1, s2){
     return this.stream_map_2((x1, x2) => x1 * x2, s1, s2);
+}
+
+DataStructure_Stream.prototype.scale_stream = function(stream, factor){
+    return this.stream_map(x => x * factor, stream);
 }
 
 
