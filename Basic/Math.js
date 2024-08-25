@@ -86,6 +86,12 @@ MathTools.prototype.isPrime = function(n){
     return result
 }
 
+MathTools.prototype.square = function(n){
+    return n*n
+}
+
+
+
 MathTool = new MathTools()
 
 // console.log("Test if queue is empty: ",Structure.is_empty_queue(queue))

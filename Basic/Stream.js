@@ -134,7 +134,7 @@ DataStructure_Stream.prototype.mergeStream = function(s1, s2){
     }
 }
 
-//
+//Compute Streams
 DataStructure_Stream.prototype.add_streams = function(s1, s2){
     return this.stream_map_2((x1, x2) => x1 + x2, s1, s2);
 }
@@ -146,6 +146,35 @@ DataStructure_Stream.prototype.mul_streams = function(s1, s2){
 DataStructure_Stream.prototype.scale_stream = function(stream, factor){
     return this.stream_map(x => x * factor, stream);
 }
+
+DataStructure_Stream.prototype.partial_sums = function(stream){
+    return BasicTool.pair(BasicTool.head(stream),
+                            ()=>this.add_streams(this.stream_tail(stream),
+                                                this.partial_sums(stream)))
+}
+
+//Make Streams
+DataStructure_Stream.prototype.integers_starting_from = function(n){
+    return BasicTool.pair(n, () => this.integers_starting_from(n + 1));
+}
+
+
+// Steams interven
+// 123, 456 => 123456
+DataStructure_Stream.prototype.stream_append = function(s1,s2){
+    return BasicTool.is_null(s1)
+        ? s2
+        : BasicTool.pair(BasicTool.head(s1),
+                            ()=>stream_append(Stream.stream_tail(s1),s2));
+}
+
+// 123, 456 => 142536
+DataStructure_Stream.prototype.interleave = function(s1,s2){
+    return BasicTool.is_null(s1)
+        ? s2: BasicTool.pair(BasicTool.head(s1),
+                    ()=>this.interleave(s2, this.stream_tail(s1)))
+}
+
 
 
 // Export Data Structure
