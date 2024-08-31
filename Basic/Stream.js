@@ -111,7 +111,7 @@ DataStructure_Stream.prototype.stream_map_2 = function(f, s1, s2){
         : BasicTool.is_null(s1) || BasicTool.is_null(s2)
         ? Error(null, "unexpected argument -- stream_map_2")
         : BasicTool.pair(f(BasicTool.head(s1),BasicTool.head(s2)), 
-               this.memo(() => this.stream_map_2(f, this.stream_tail(s1),
+                this.memo(() => this.stream_map_2(f, this.stream_tail(s1),
                                                 this.stream_tail(s2))));
 }
 
