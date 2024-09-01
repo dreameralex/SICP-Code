@@ -88,7 +88,7 @@ function eval_block(component, env){
     const locals = scan_out_declarations(body);
     const unassigneds = list_of_unassigned(locals);
     return evaluate(body, extend_environment(locals,
-                                             t   unassigneds,
+                                             unassigneds,
                                                 env
     ))
 }
@@ -135,7 +135,7 @@ function eval_declaration(component, env){
 //4.1.2 Representing Components
 // Literal expression
 function is_literal(component){
-    return this.is_tagged_list(component, "literal")
+    return is_tagged_list(component, "literal")
 }
 
 function is_tagged_list(component, the_tag){
@@ -206,7 +206,7 @@ function is_declaration(component){
             is_tagged_list(component, "variable_declaration") || 
             is_tagged_list(component, "function_declaration"); 
 }
-function operator_combination_to_application(){
+function operator_combination_to_application(component){
     const operator = operator_symbol(component);
     return is_unary_operator_combination(component)
         ? make_application(make_name(operator),
@@ -214,5 +214,112 @@ function operator_combination_to_application(){
         : make_application(make_name(operator),
                             BasicTool.list(first_operand(component),
                                             second_operand(component)))
+}
+
+//4.1.3 Evaluator Data Structures
+//Testing of predicates
+function is_truthy(x){
+    return BasicTool.is_bollean(x)
+        ? x
+        : Error(x, "boolean expected, received");
+}
+
+//Representing functions
+function make_function(parameters, body, env) { I
+    return BasicTool.list("compound_function",
+    parameters, body, env);
+}
+function is_compound_function(f) {
+    return is_tagged_list(f, "compound_function");
+}
+function function_parameters(f) {
+    return BasicTool.list_ref(f, 1);
+}
+function function_body(f) {
+    return BasicTool.list_ref(f, 2);
+}
+function function_environment(f) {
+    return BasicTool.list_ref(f, 3);
+}
+
+//Representing return values
+function make_return_value(content) { I
+    return BasicTool.list("return_value", content);
+}
+
+function is_return_value(value) {
+    return is_tagged_list(value, "return_value");
+}
+
+function return_value_content(value) {
+    return BasicTool.head(BasicTool.tail(value));
+}
+
+//Operations on Environments
+function enclosing_environment(env) { I
+    return BasicTool.tail(env);
+}
+function first_frame(env) {
+    return BasicTool.head(env);
+}
+const the_empty_environment = null;
+
+function make_frame(symbols, values) { I
+    return BasicTool.pair(symbols, values);
+}
+function frame_symbols(frame) {
+    return BasicTool.head(frame);
+}
+function frame_values(frame) {
+    return BasicTool.tail(frame);
+}
+
+function extend_environment(symbols, vals, base_env){
+    return BasicTool.length(symbols) === BasicTool.length(vals)
+        ? BasicTool.pair(make_frame(symbols, vals), base_env)
+        : Error(BasicTool.pair(symbols, vals), 
+                                BasicTool.length(symbols) < BasicTool.length(vals)
+                                ? "too many arguments supplied"
+                                :  "too few arguments supplied" )
+}
+
+function lookup_symbol_value(symbol, env){
+    function env_loop(env){
+        function scan(symbols, vals){
+            return BasicTool.is_null(symbols)
+                ? env_loop(enclosing_environment(env))
+                : symbol === BasicTool.head(symbols)
+                ? BasicTool.head(vals)
+                : scan(BasicTool.tail(symbols), BasicTool.tail(vals))
+        }
+        if(env === the_empty_environment){
+            Error(symbol, "unbound name")
+        }else{
+            const frame = first_frame(env);
+            return scan(frame_symbols(frame),
+                        frame_values(frame))
+        }
+    }
+    return env_loop(env);
+}
+
+function assign_symbol_value(symbol, val, env){
+    function env_loop(env){
+        function scan(symbols, vals){
+            return BasicTool.is_null(symbols)
+            ? env_loop(enclosing_environment(env))
+            : symbol === BasicTool.head(symbols)
+            ? BasicTool.set_head(vals, val)
+            : scan(BasicTool.tail(symbols), BasicTool.tail(vals))
+        }
+        if(env === the_empty_environment){
+            Error(symbol, "unbound name -- assignment")
+        }else{
+            const frame = first_frame(env);
+            return scan(frame_symbols(frame),
+                        frame_values(frame))
+        }
+    }
+    return env_loop(env);
 }
 

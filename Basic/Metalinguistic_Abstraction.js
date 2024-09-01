@@ -212,7 +212,7 @@ Metalinguistic_Model.prototype.is_declaration = function(component){
             is_tagged_list(component, "function_declaration"); 
 }
 
-Metalinguistic_Model.prototype.operator_combination_to_application = function(){
+Metalinguistic_Model.prototype.operator_combination_to_application = function(component){
     const operator = operator_symbol(component);
     return is_unary_operator_combination(component)
         ? make_application(make_name(operator),
@@ -221,6 +221,128 @@ Metalinguistic_Model.prototype.operator_combination_to_application = function(){
                             BasicTool.list(first_operand(component),
                                             second_operand(component)))
 }
+
+//4.1.3 Evaluator Data Structures
+//Testing of predicates
+
+Metalinguistic_Model.prototype.is_truthy = function(x){
+    return BasicTool.is_bollean(x)
+        ? x
+        : Error(x, "boolean expected, received");
+}
+
+//Representing functions
+Metalinguistic_Model.prototype.is_truthy = 
+function make_function(parameters, body, env) { I
+    return BasicTool.list("compound_function",
+    parameters, body, env);
+}
+
+Metalinguistic_Model.prototype.is_compound_function =  function(f) {
+    return is_tagged_list(f, "compound_function");
+}
+
+Metalinguistic_Model.prototype.function_parameters = function(f) {
+    return BasicTool.list_ref(f, 1);
+}
+
+Metalinguistic_Model.prototype.function_body = function(f) {
+    return BasicTool.list_ref(f, 2);
+}
+
+Metalinguistic_Model.prototype.function_environment = function(f) {
+    return BasicTool.list_ref(f, 3);
+}
+
+//Representing return values
+
+Metalinguistic_Model.prototype.make_return_value = function(content) { I
+    return BasicTool.list("return_value", content);
+}
+
+Metalinguistic_Model.prototype.is_return_value = function(value) {
+    return this.is_tagged_list(value, "return_value");
+}
+
+Metalinguistic_Model.prototype.return_value_content = function(value) {
+    return BasicTool.head(BasicTool.tail(value));
+}
+
+//Operations on Environments
+Metalinguistic_Model.prototype.enclosing_environment = function(env) { I
+    return BasicTool.tail(env);
+}
+
+Metalinguistic_Model.prototype.first_frame = function(env) {
+    return BasicTool.head(env);
+}
+
+const the_empty_environment = null;
+
+Metalinguistic_Model.prototype.make_frame = function(symbols, values) { I
+    return BasicTool.pair(symbols, values);
+}
+
+Metalinguistic_Model.prototype.frame_symbols = function(frame) {
+    return BasicTool.head(frame);
+}
+
+Metalinguistic_Model.prototype.frame_values = function(frame) {
+    return BasicTool.tail(frame);
+}
+
+Metalinguistic_Model.prototype.extend_environment = function(symbols, vals, base_env){
+    return BasicTool.length(symbols) === BasicTool.length(vals)
+        ? BasicTool.pair(make_frame(symbols, vals), base_env)
+        : Error(BasicTool.pair(symbols, vals), 
+                                BasicTool.length(symbols) < BasicTool.length(vals)
+                                ? "too many arguments supplied"
+                                :  "too few arguments supplied" )
+}
+
+Metalinguistic_Model.prototype.lookup_symbol_value = function(symbol, env){
+    function env_loop(env){
+        function scan(symbols, vals){
+            return BasicTool.is_null(symbols)
+                ? env_loop(this.enclosing_environment(env))
+                : symbol === BasicTool.head(symbols)
+                ? BasicTool.head(vals)
+                : scan(BasicTool.tail(symbols), BasicTool.tail(vals))
+        }
+        if(env === the_empty_environment){
+            Error(symbol, "unbound name")
+        }else{
+            const frame = first_frame(env);
+            return scan(frame_symbols(frame),
+                        frame_values(frame))
+        }
+    }
+    return env_loop(env);
+}
+
+Metalinguistic_Model.prototype.assign_symbol_value = function(symbol, val, env){
+    function env_loop(env){
+        function scan(symbols, vals){
+            return BasicTool.is_null(symbols)
+            ? env_loop(this.enclosing_environment(env))
+            : symbol === BasicTool.head(symbols)
+            ? BasicTool.set_head(vals, val)
+            : scan(BasicTool.tail(symbols), BasicTool.tail(vals))
+        }
+        if(env === the_empty_environment){
+            Error(symbol, "unbound name -- assignment")
+        }else{
+            const frame = first_frame(env);
+            return scan(frame_symbols(frame),
+                        frame_values(frame))
+        }
+    }
+    return env_loop(env);
+}
+
+
+
+
 
 
 Metalinguistic = new Metalinguistic_Model()

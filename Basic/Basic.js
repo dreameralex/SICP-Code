@@ -76,6 +76,19 @@ Basic.prototype.test = function(x,y){
     return this.pair(x,y)
 }
 
+Basic.prototype.list_ref = function(items, n){
+    return n === 0
+        ? this.head(items)
+        : this.list_ref(this.tail(items), n-1);
+}
+
+Basic.prototype.length = function(items){
+    return this.is_null(items)
+        ? 0
+        : 1 + this.length(this.tail(items))
+}
+
+
 // To tell whether x in itmes, itme is a list
 Basic.prototype.member = function(item, x){
    return this.is_null(x)
@@ -174,6 +187,12 @@ Basic.prototype.enumerate_interval= function(low, high){
 
 Basic.prototype.is_null = function(item){
     return item === null
+        ? true
+        : false
+}
+
+Basic.prototype.is_bollean = function(item){
+    return item === 1 ||  item === 0
         ? true
         : false
 }
