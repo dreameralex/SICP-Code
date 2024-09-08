@@ -7,18 +7,18 @@ class Metalinguistic_Model {
 
 Metalinguistic_Model.prototype.evaluate = function(component, env){
     return this.is_literal(component)
-        ? literal_value(component)
+        ? this.literal_value(component)
         : is_name(component)
-        ? lookup_symbol_value(symbol_of_name(component), env)
+        ? this.lookup_symbol_value(symbol_of_name(component), env)
         : is_application(component)
         ? this.apply(evaluate(function_expression(component), env),
                 this.list_of_values(arg_expressions(component), env))
         : is_operator_combination(component)
-        ? evaluate(this.operator_combination_to_application(component), env)
+        ? this.evaluate(this.operator_combination_to_application(component), env)
         : is_conditional(component)
         ? this.eval_conditional(component, env)
         : is_lambda_expression(component)
-        ? make_function(this.lambda_parameter_symbols(component),
+        ? this.make_function(this.lambda_parameter_symbols(component),
                             lambda_body(component), env)
         : is_sequence(component)
         ? this.eval_sequence(sequence_statements(component), env)
@@ -27,7 +27,7 @@ Metalinguistic_Model.prototype.evaluate = function(component, env){
         : is_return_statement(component)
         ? this.eval_return_statement(component)
         : is_function_declaration(component)
-        ? evaluate(function_decl_to_constant_decl(component), env)
+        ? this.evaluate(function_decl_to_constant_decl(component), env)
         : this.is_declaration(component, env)
         ? this.eval_declaration(component, env)
         : is_assignment(component)
@@ -38,11 +38,11 @@ Metalinguistic_Model.prototype.evaluate = function(component, env){
 
 //Apply
 Metalinguistic_Model.prototype.apply = function(fun, args){
-    if(is_primitive_function(fun)){
+    if(this.is_primitive_function(fun)){
         return apply_primitive_function(fun, args);
-    } else if(is_compound_function(fun)){
+    } else if(this.is_compound_function(fun)){
         const result = this.evaluate(function_body(fun),
-                                    extend_environment(
+                                    this.extend_environment(
                                         function_parameters(cun),
                                         args,
                                         function_environment(fun)
@@ -91,7 +91,7 @@ Metalinguistic_Model.prototype.eval_block = function(component, env){
     const body = block_body(component);
     const locals = this.scan_out_declarations(body);
     const unassigneds = this.list_of_unassigned(locals);
-    return this.evaluate(body, extend_environment(locals,
+    return this.evaluate(body, this.extend_environment(locals,
                                                 unassigneds,
                                                 env
     ))
@@ -207,9 +207,9 @@ Metalinguistic_Model.prototype.make_constant_declaration = function(name, value_
 }
 
 Metalinguistic_Model.prototype.is_declaration = function(component){
-    return is_tagged_list(component, "constant_declaration") || 
-            is_tagged_list(component, "variable_declaration") || 
-            is_tagged_list(component, "function_declaration"); 
+    return this.is_tagged_list(component, "constant_declaration") || 
+            this.is_tagged_list(component, "variable_declaration") || 
+            this.is_tagged_list(component, "function_declaration"); 
 }
 
 Metalinguistic_Model.prototype.operator_combination_to_application = function(component){
@@ -221,6 +221,7 @@ Metalinguistic_Model.prototype.operator_combination_to_application = function(co
                             BasicTool.list(first_operand(component),
                                             second_operand(component)))
 }
+
 
 //4.1.3 Evaluator Data Structures
 //Testing of predicates
@@ -239,7 +240,7 @@ function make_function(parameters, body, env) { I
 }
 
 Metalinguistic_Model.prototype.is_compound_function =  function(f) {
-    return is_tagged_list(f, "compound_function");
+    return this.is_tagged_list(f, "compound_function");
 }
 
 Metalinguistic_Model.prototype.function_parameters = function(f) {
@@ -340,12 +341,104 @@ Metalinguistic_Model.prototype.assign_symbol_value = function(symbol, val, env){
     return env_loop(env);
 }
 
+Metalinguistic_Model.prototype.setup_environment = function(){
+    return extend_environment(
+        BasicTool.append(primitive_function_symbols,
+                            primitive_constant_symbols),
+        BasicTool.append(primitive_function_objects,
+                            primitive_constant_values),
+        the_empty_environment             
+    )
+}
 
+Metalinguistic_Model.prototype.is_primitive_function = function(fun) { I
+    return this.is_tagged_list(fun, "primitive");
+    }
 
-
+Metalinguistic_Model.prototype.primitive_implementation = function(fun) {
+    return BasicTool.head(BasicTool.tail(fun));
+}
 
 
 Metalinguistic = new Metalinguistic_Model()
+
+//The function setup_environment will get the primitive names and implementation functionsfrom a list
+const primitive_functions = BasicTool.list(
+    BasicTool.list("head", BasicTool.head),
+    BasicTool.list("tail", BasicTool.tail),
+    BasicTool.list("pair", BasicTool.pair),
+    BasicTool.list("is_null", BasicTool.is_null),
+    BasicTool.list("+", (x,y)=>x+y),
+)
+
+const primitive_function_symbols = BasicTool.map(f => BasicTool.head(f), primitive_functions);
+const primitive_function_objects = BasicTool.map(f => BasicTool.list("primitive", 
+                                                BasicTool.head(BasicTool.tail(f))), primitive_functions);
+
+
+const primitive_constants = BasicTool.list(BasicTool.list("undefined", undefined),
+                                            BasicTool.list("math_PI", math_PI));
+const primitive_constant_symbols = BasicTool.map(c => BasicTool.head(c), primitive_constants);
+const primitive_constant_values = BasicTool.map(c => BasicTool.head(BasicTool.tail(c)), primitive_constants);
+
+
+Metalinguistic_Model.prototype.apply_primitive_function = function(fun, arglist) { I
+    return apply_in_underlying_javascript(
+        this.primitive_implementation(fun),
+        arglist);
+}
+
+Metalinguistic_Model.prototype.apply_in_underlying_javascript = function(prim, arglist) {
+    const arg_vector = []; // empty vector
+    let i = 0;
+    while (!BasicTool.is_null(arglist)) {
+        arg_vector[i] = BasicTool.head(arglist); // storing value at index i
+        i = i + 1;
+        arglist = BasicTool.tail(arglist);
+    }
+    return prim.apply(prim, arg_vector); // apply is accessed via prim
+}
+
+const input_prompt = "M-evaluate input: "; 
+const output_prompt = "M-evaluate value: ";
+
+
+Metalinguistic_Model.prototype.driver_loop = function(env){
+    const input = user_read(input_prompt);
+    if (is_null(input)) {
+    display("evaluator terminated");
+    } else {
+    const program = parse(input);
+    const locals = this.scan_out_declarations(program);
+    const unassigneds = this.list_of_unassigned(locals);
+    const program_env = this.extend_environment(locals, unassigneds, env);
+    const output = this.evaluate(program, program_env);
+    user_print(output_prompt, output);
+    return driver_loop(program_env);
+    }
+}
+
+Metalinguistic_Model.prototype.user_read = function(prompt_string) {
+    return prompt(prompt_string);
+}
+
+Metalinguistic_Model.prototype.user_print = function(string, object) {
+    function prepare(object) {
+        return this.is_compound_function(object)
+            ? "< compound-function >"
+            : this.is_primitive_function(object)
+            ? "< primitive-function >"
+            : is_pair(object)
+            ? pair(prepare(head(object)),
+            prepare(tail(object)))
+            : object;
+    }
+    display(string + " " + stringify(prepare(object)));
+}
+
+
+let the_global_environment = Metalinguistic.setup_environment();
 module.exports = {
-    Metalinguistic
+    Metalinguistic,
+    the_global_environment
 }

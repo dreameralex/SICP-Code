@@ -20,6 +20,7 @@ Basic.prototype.get_new_pair = function(){
 }
 
 Basic.prototype.pair = function(x,y){
+    this.name = "pair11111"
     function set_x(v){x = v}
     function set_y(v){y = v}
     return m => m === 'head'
@@ -75,6 +76,9 @@ Basic.prototype.list = function(...rest){
 Basic.prototype.test = function(x,y){
     return this.pair(x,y)
 }
+
+
+
 
 Basic.prototype.list_ref = function(items, n){
     return n === 0
