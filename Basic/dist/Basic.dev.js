@@ -21,6 +21,8 @@ Basic.prototype.get_new_pair = function () {
 };
 
 Basic.prototype.pair = function (x, y) {
+  this.name = "pair11111";
+
   function set_x(v) {
     x = v;
   }
@@ -53,7 +55,7 @@ Basic.prototype.set_tail = function (z, new_value) {
 };
 
 Basic.prototype.map = function (fun, items) {
-  return items === null ? null : this.pair(this.fun(head(items)), map(fun, tail(items)));
+  return items === null ? null : this.pair(fun(this.head(items)), this.map(fun, this.tail(items)));
 }; // List
 
 
@@ -76,6 +78,19 @@ Basic.prototype.test = function (x, y) {
   return this.pair(x, y);
 };
 
+Basic.prototype.list_ref = function (items, n) {
+  return n === 0 ? this.head(items) : this.list_ref(this.tail(items), n - 1);
+};
+
+Basic.prototype.length = function (items) {
+  return this.is_null(items) ? 0 : 1 + this.length(this.tail(items));
+}; // To tell whether x in itmes, itme is a list
+
+
+Basic.prototype.member = function (item, x) {
+  return this.is_null(x) ? null : item === this.head(item) ? x : this.member(item, this.tail(x));
+};
+
 Basic.prototype.print_list_temp = function (items) {
   temp = items;
 
@@ -86,17 +101,17 @@ Basic.prototype.print_list_temp = function (items) {
 };
 
 Basic.prototype.print_list = function (items) {
-  if (tail(items) !== null) {
-    if (head(items).name === "dispatch") {
+  if (this.tail(items) !== null) {
+    if (this.head(items).name === "dispatch") {
       print_list(this.head(items));
       console.log("~");
     } else {
       console.log(this.head(items));
     }
 
-    print_list(tail(items));
+    this.tail(items);
   } else {
-    if (head(items).name === "dispatch") {
+    if (this.head(items).name === "dispatch") {
       print_list(this.head(items));
       console.log("~");
     } else {
@@ -120,6 +135,7 @@ Basic.prototype.append = function (list1, list2) {
   }
 
   function append_process(list1, list2) {
+    console.log(1);
     return list1 === null ? list2 : this.pair(this.head(list1), append_process(this.tail(list1), list2));
   }
 
@@ -145,12 +161,63 @@ Basic.prototype.is_null = function (item) {
   return item === null ? true : false;
 };
 
+Basic.prototype.is_bollean = function (item) {
+  return item === 1 || item === 0 ? true : false;
+};
+
 Basic.prototype.is_undefined = function (item) {
   return item === undefined ? true : false;
 };
 
 Basic.prototype.equal = function (item1, item2) {
   return item1 === item2 ? true : false;
+};
+
+Basic.prototype.stringfy = function (item) {
+  return item.toString();
+};
+
+Basic.prototype.display = function (item) {
+  console.log(item);
+}; // Math
+
+
+Basic.prototype.is_even = function (n) {
+  return n % 2 === 0 ? true : false;
+};
+
+function is_even(n) {
+  return n % 2 === 0 ? true : false;
+}
+
+Basic.prototype.expmod = function (base, exp, m) {
+  // console.log(1)
+  if (exp === 0) {
+    return 1;
+  } else {
+    if (is_even(exp)) {
+      var half_exp = this.expmod(base, exp / 2, m);
+      return half_exp * half_exp % m;
+    } else {
+      return base * this.expmod(base, exp - 1, m) % m;
+    }
+  }
+};
+
+Basic.prototype.fermat_test = function (n) {
+  expmod = this.expmod;
+
+  function try_it(a) {
+    return expmod(a, n, n) === a;
+  } // console.log("fermat_test",n,try_it(1 + Math.floor(Math.random() * (n - 1))))
+
+
+  return try_it(1 + Math.floor(Math.random() * (n - 1)));
+};
+
+Basic.prototype.fast_is_prime = function (n, times) {
+  // console.log("fast_is_prime",n, times,this.prototype)
+  return times === 0 ? true : this.fermat_test(n) ? this.fast_is_prime(n, times - 1) : false;
 };
 
 BasicTool = new Basic(); // console.log("Test if queue is empty: ",Structure.is_empty_queue(queue))

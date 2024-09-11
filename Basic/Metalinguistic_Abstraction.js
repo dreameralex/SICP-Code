@@ -1,6 +1,9 @@
 const BasicTool = require('../Basic/Basic').BasicTool
 
 
+math_PI = 3.14
+
+
 class Metalinguistic_Model {
 
 }
@@ -270,7 +273,7 @@ Metalinguistic_Model.prototype.return_value_content = function(value) {
 }
 
 //Operations on Environments
-Metalinguistic_Model.prototype.enclosing_environment = function(env) { I
+Metalinguistic_Model.prototype.enclosing_environment = function(env) {
     return BasicTool.tail(env);
 }
 
@@ -280,7 +283,7 @@ Metalinguistic_Model.prototype.first_frame = function(env) {
 
 const the_empty_environment = null;
 
-Metalinguistic_Model.prototype.make_frame = function(symbols, values) { I
+Metalinguistic_Model.prototype.make_frame = function(symbols, values) {
     return BasicTool.pair(symbols, values);
 }
 
@@ -294,7 +297,7 @@ Metalinguistic_Model.prototype.frame_values = function(frame) {
 
 Metalinguistic_Model.prototype.extend_environment = function(symbols, vals, base_env){
     return BasicTool.length(symbols) === BasicTool.length(vals)
-        ? BasicTool.pair(make_frame(symbols, vals), base_env)
+        ? BasicTool.pair(this.make_frame(symbols, vals), base_env)
         : Error(BasicTool.pair(symbols, vals), 
                                 BasicTool.length(symbols) < BasicTool.length(vals)
                                 ? "too many arguments supplied"
@@ -341,8 +344,11 @@ Metalinguistic_Model.prototype.assign_symbol_value = function(symbol, val, env){
     return env_loop(env);
 }
 
+
+
+
 Metalinguistic_Model.prototype.setup_environment = function(){
-    return extend_environment(
+    return this.extend_environment(
         BasicTool.append(primitive_function_symbols,
                             primitive_constant_symbols),
         BasicTool.append(primitive_function_objects,
@@ -369,11 +375,16 @@ const primitive_functions = BasicTool.list(
     BasicTool.list("pair", BasicTool.pair),
     BasicTool.list("is_null", BasicTool.is_null),
     BasicTool.list("+", (x,y)=>x+y),
-)
+);
 
 const primitive_function_symbols = BasicTool.map(f => BasicTool.head(f), primitive_functions);
-const primitive_function_objects = BasicTool.map(f => BasicTool.list("primitive", 
-                                                BasicTool.head(BasicTool.tail(f))), primitive_functions);
+
+// BasicTool.print_list_temp(primitive_function_symbols)
+
+
+
+const primitive_function_objects = BasicTool.map(f => BasicTool.list("primitive", BasicTool.head(BasicTool.tail(f))), 
+                                                            primitive_functions);
 
 
 const primitive_constants = BasicTool.list(BasicTool.list("undefined", undefined),
@@ -382,7 +393,7 @@ const primitive_constant_symbols = BasicTool.map(c => BasicTool.head(c), primiti
 const primitive_constant_values = BasicTool.map(c => BasicTool.head(BasicTool.tail(c)), primitive_constants);
 
 
-Metalinguistic_Model.prototype.apply_primitive_function = function(fun, arglist) { I
+Metalinguistic_Model.prototype.apply_primitive_function = function(fun, arglist) {
     return apply_in_underlying_javascript(
         this.primitive_implementation(fun),
         arglist);
@@ -404,23 +415,25 @@ const output_prompt = "M-evaluate value: ";
 
 
 Metalinguistic_Model.prototype.driver_loop = function(env){
-    const input = user_read(input_prompt);
-    if (is_null(input)) {
-    display("evaluator terminated");
+    const input = this.user_read(input_prompt);
+    if (BasicTool.is_null(input)) {
+        BasicTool.display("evaluator terminated");
     } else {
-    const program = parse(input);
-    const locals = this.scan_out_declarations(program);
-    const unassigneds = this.list_of_unassigned(locals);
-    const program_env = this.extend_environment(locals, unassigneds, env);
-    const output = this.evaluate(program, program_env);
-    user_print(output_prompt, output);
-    return driver_loop(program_env);
+        const program = parse(input);
+        const locals = this.scan_out_declarations(program);
+        const unassigneds = this.list_of_unassigned(locals);
+        const program_env = this.extend_environment(locals, unassigneds, env);
+        const output = this.evaluate(program, program_env);
+        this.user_print(output_prompt, output);
+        return this.driver_loop(program_env);
     }
 }
 
 Metalinguistic_Model.prototype.user_read = function(prompt_string) {
-    return prompt(prompt_string);
+    return  prompt(prompt_string);
 }
+//如何结局Node.js中没有prompt?
+
 
 Metalinguistic_Model.prototype.user_print = function(string, object) {
     function prepare(object) {
@@ -437,8 +450,15 @@ Metalinguistic_Model.prototype.user_print = function(string, object) {
 }
 
 
+
+// console.log("primitive_constant_symbols:", typeof(primitive_constant_symbols))
+// console.log("primitive_function_objects:", typeof(primitive_function_objects))
+
+
+
+
 let the_global_environment = Metalinguistic.setup_environment();
 module.exports = {
     Metalinguistic,
-    the_global_environment
+    // the_global_environment
 }

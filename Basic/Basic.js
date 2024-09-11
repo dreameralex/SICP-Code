@@ -57,8 +57,8 @@ Basic.prototype.set_tail = function(z, new_value){
 Basic.prototype.map = function(fun, items){
     return items === null
         ? null
-        : this.pair(this.fun(head(items)),
-            map(fun, tail(items))
+        : this.pair(fun(this.head(items)),
+            this.map(fun, this.tail(items))
         )
 }
 // List
@@ -144,21 +144,34 @@ Basic.prototype.print_list = function(items){
 //         : pair(head(list1), append(tail(list1),list2))
 // }
 
-Basic.prototype.append = function(list1, list2){
-    if (typeof(list1) !== 'function'){
-        list1 = this.list(list1)
-    }
-    if (list2.name !== 'function'){
-        list2 = this.list(list2)
-    }
+// Basic.prototype.append = function(list1, list2){
+//     if (typeof(list1) !== 'function'){
+//         console.log("list1")
+//         list1 = this.list(list1)
+//     }
+//     if (list2.name !== 'function'){
+//         console.log("list2")
+//         list2 = this.list(list2)
+//     }
     
-    function append_process(list1,list2){
-        return list1 === null
+//     function append_process(list1,list2){
+//         console.log(1)
+//         return list1 === null
+//         ? list2
+//         : this.pair(this.head(list1), append_process(this.tail(list1),list2))
+//     }
+//     return append_process(list1,list2)
+// }
+
+Basic.prototype.append = function(list1, list2){
+    return this.is_null(list1)
         ? list2
-        : this.pair(this.head(list1), append_process(this.tail(list1),list2))
-    }
-    return append_process(list1,list2)
+        : this.pair(this.head(list1), this.append(this.tail(list1), list2))
 }
+
+
+
+
 
 Basic.prototype.filter = function(predicate, sequence){
     return sequence === null
@@ -267,6 +280,12 @@ Basic.prototype.fast_is_prime = function(n, times){
         ? this.fast_is_prime(n, times -1)
         : false;
 }
+
+
+Basic.prototype.prompt = function(n){
+    console.log(n)
+}
+
 
 
 
